@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>釣り人の魚図鑑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Shippori+Mincho+B1:wght@600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=EB+Garamond:ital@1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+/* 表紙（専門書の装丁）。pack の renderCover を差し替える */
+window.coverPro=function(){
+  const order=bookOrder(),ch=GROUPS.filter(g=>order.some(f=>chapterOf(f).g===g)).length;
+  app.innerHTML=`<div class="bk-cover"><div class="bk-frame">
+<div style="flex:.6;min-height:24px"></div><div class="bk-series">釣魚研究叢書　Ⅰ</div>
+<div class="bk-orn"><span></span><i>◆</i><span></span></div>
+<h1 class="bk-title"><small>釣り人の</small>魚 図 鑑</h1>
+<div class="bk-sub">生態・資源・釣法の総合解説</div>
+<div class="bk-en">A Field Guide to the Angling Fishes of Japan<br><i>with notes on ecology, fisheries and angling</i></div>
+<div style="flex:1;min-height:48px"></div>
+<div class="bk-meta">収録 ${order.length} 種　・　全 ${ch} 章　・　図版多数</div>
+<div class="bk-orn"><span></span><i>◆</i><span></span></div>
+<div class="bk-ed">スタジオ・ペン　編</div>
+<div class="bk-imprint">STUDIO PEN　·　MMXXVI<br>初版　随時増補</div>
+</div>
+<nav class="bk-nav" aria-label="この本を読む"><a href="#toc"><b>目次</b><span>CONTENTS</span></a><a href="#ch-${GROUPS[0].id}"><b>第一章へ</b><span>CHAPTER Ⅰ</span></a><a href="#index"><b>索引</b><span>INDEX</span></a></nav></div>`;
+};
+</script>
+<script src="pack.js"></script>
+<script>
+/* 魚図鑑のデータは pack.js に gzip 圧縮して格納（core.js と fish/01〜62 を元の順に収めた JSON 配列）。
+   新しい魚種ファイルは EXTRA に1行ずつ足す（pack の後に順に読み込まれる）。 */
+const EXTRA=[
+"fish/63-kichinu.js",
+"fish/64-chidai.js",
+"fish/65-kidai.js",
+"fish/66-hedai.js",
+"fish/67-koshodai.js",
+];
+(async function(){
+  const run=code=>{const s=document.createElement("script");s.textContent=code;document.head.appendChild(s);};
+  const load=src=>new Promise((ok,ng)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=ng;document.head.appendChild(s);});
+  try{
+    const bin=Uint8Array.from(atob(window.PACK),c=>c.charCodeAt(0));
+    const txt=await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+    JSON.parse(txt).forEach(run);
+    for(const f of EXTRA){try{await load(f);}catch(e){}}
+    if(window.coverPro)renderCover=window.coverPro;window.addEventListener("hashchange",route);route();
+  }catch(e){document.getElementById("app").innerHTML='<p style="padding:24px">図鑑のデータを読み込めませんでした。ブラウザを最新版にしてください。</p>';}
+})();
+</script>
+</body>
+</html>
