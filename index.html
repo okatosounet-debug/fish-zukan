@@ -31,16 +31,30 @@ window.coverPro=function(){
 <nav class="bk-nav" aria-label="この本を読む"><a href="#toc"><b>目次</b><span>CONTENTS</span></a><a href="#ch-${GROUPS[0].id}"><b>第一章へ</b><span>CHAPTER Ⅰ</span></a><a href="#index"><b>索引</b><span>INDEX</span></a></nav></div>`;
 };
 </script>
+<script src="photos.js"></script>
+<script>
+/* 実写真（Wikimedia Commons の自由ライセンス写真）。読めないときはイラストのまま */
+window.photoHook=function(){
+  const P=window.PHOTO_DATA||{};
+  const img=(p,alt,cls)=>{const i=new Image();i.alt=alt;i.className=cls;i.loading="lazy";i.decoding="async";i.referrerPolicy="no-referrer";i.src=p.t;return i;};
+  const _rp=renderPage;
+  renderPage=function(f){_rp(f);const p=P[f.id];if(!p)return;const pl=document.querySelector(".hero .plate")||document.querySelector("figure.plate");if(!pl)return;
+    const i=img(p,f.name+"の写真","realphoto");i.onload=()=>{const s=pl.querySelector("svg");if(s)s.remove();pl.classList.add("has-photo");const c=pl.querySelector("figcaption");if(c)c.innerHTML=`写真：<a href="${p.p}" target="_blank" rel="noopener">${p.a||"Wikimedia Commons"}</a>（${p.l}）／Wikimedia Commons`;};i.onerror=()=>i.remove();pl.insertBefore(i,pl.firstChild);};
+  const _rc=renderChapter;
+  renderChapter=function(g){_rc(g);document.querySelectorAll(".sh-item").forEach(a=>{const id=(a.getAttribute("href")||"").slice(1),p=P[id];if(!p)return;const s=a.querySelector("svg");const i=img(p,"","sh-photo");i.onload=()=>{if(s)s.replaceWith(i);};});};
+};
+</script>
 <script src="pack.js"></script>
 <script>
 /* 魚図鑑のデータは pack.js に gzip 圧縮して格納（core.js と fish/01〜62 を元の順に収めた JSON 配列）。
    新しい魚種ファイルは EXTRA に1行ずつ足す（pack の後に順に読み込まれる）。 */
 const EXTRA=[
-"fish/63-kichinu.js",
-"fish/64-chidai.js",
-"fish/65-kidai.js",
-"fish/66-hedai.js",
-"fish/67-koshodai.js",
+"fish/73-kurosoi.js",
+"fish/74-kujime.js",
+"fish/75-hokke.js",
+"fish/76-izukasago.js",
+"fish/77-kijihata.js",
+"fish/78-mahata.js",
 ];
 (async function(){
   const run=code=>{const s=document.createElement("script");s.textContent=code;document.head.appendChild(s);};
@@ -50,7 +64,7 @@ const EXTRA=[
     const txt=await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
     JSON.parse(txt).forEach(run);
     for(const f of EXTRA){try{await load(f);}catch(e){}}
-    if(window.coverPro)renderCover=window.coverPro;window.addEventListener("hashchange",route);route();
+    if(window.coverPro)renderCover=window.coverPro;if(window.photoHook)window.photoHook();window.addEventListener("hashchange",route);route();
   }catch(e){document.getElementById("app").innerHTML='<p style="padding:24px">図鑑のデータを読み込めませんでした。ブラウザを最新版にしてください。</p>';}
 })();
 </script>
