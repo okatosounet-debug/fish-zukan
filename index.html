@@ -49,15 +49,8 @@ window.photoHook=function(){
 /* 魚図鑑のデータは pack.js に gzip 圧縮して格納（core.js と fish/01〜62 を元の順に収めた JSON 配列）。
    新しい魚種ファイルは EXTRA に1行ずつ足す（pack の後に順に読み込まれる）。 */
 const EXTRA=[
-"fish/83-meitagarei.js",
-"fish/84-magarei.js",
-"fish/85-hoshigarei.js",
-"fish/86-aogisu.js",
-"fish/87-nibe.js",
-"fish/88-nezumigochi.js",
-"fish/89-hiiragi.js",
-"fish/90-houbou.js",
-"fish/91-kuromejina.js",
+"fish/93-kyusen.js",
+"fish/94-sasanohabera.js",
 ];
 (async function(){
   const run=code=>{const s=document.createElement("script");s.textContent=code;document.head.appendChild(s);};
